@@ -1,5 +1,5 @@
 
-const editProductBroadcast=function(product){
+const editClicked=function(product){
     console.log(product);
     console.log("Reducer will capture the event and payload..")
     return({
@@ -8,4 +8,4 @@ const editProductBroadcast=function(product){
     })
 }
 
-export default editProductBroadcast
+export default editClicked

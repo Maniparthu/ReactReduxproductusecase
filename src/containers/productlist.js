@@ -1,11 +1,15 @@
-import React from 'react'
-import { connect } from 'react-redux'
-import { bindActionCreators } from 'redux'
-import productClickedBroadcast from '../actions/productonclicked'
-import axios from 'axios'
+import React from 'react';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import axios from "axios"
 import displayProductBroadcast from '../actions/displayproductsbroadcaster'
-class ProductList extends React.Component{
-
+import { Card, Button, Alert } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
+import deleteProductBroadcast from '../actions/deleteproductbroadcaster';
+import productClickedBroadcast from '../actions/productonclicked';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import './products.css'
+class ProductList extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
@@ -13,10 +17,28 @@ class ProductList extends React.Component{
             filteredProducts: []
         }
     }
-
-   componentWillMount() {
+    componentWillMount() {
         console.log("Mounting all products");
         this.allProducts()
+    }
+
+    componentDidMount() {
+        console.log(this.props)
+    }
+
+    searchProduct = (event) => {
+        let value = event.target.value
+        if (value === "") {
+            this.allProducts()
+        }
+        this.setState({ searchValue: value })
+        console.log(value)
+        let searchFilter = []
+        searchFilter = this.props.products.filter(w => {
+            return (w.name.toLowerCase().startsWith(value.trim().toLowerCase())) || (w.category.toLowerCase().startsWith(value.trim().toLowerCase()))
+        })
+        this.setState({ filteredProducts: searchFilter })
+        console.log(searchFilter)
     }
 
     allProducts() {
@@ -29,77 +51,102 @@ class ProductList extends React.Component{
             })
     }
 
-    searchProduct = (event) => {
-        let searchV = event.target.value
-        if (searchV === "") {
-            this.allProducts()
-        }
-        this.setState({ searchValue: searchV })
-        console.log(searchV)
-        let searchF = []
-        searchF = this.props.products.filter(f => {
-            return f.name.toLowerCase().startsWith(searchV.trim().toLowerCase())
-        })
-        this.setState({ filteredProducts: searchF })
-        console.log(searchF)
-    }
-
     getAllProducts = () => {
         if (this.state.searchValue !== "") {
             if (this.state.filteredProducts.length === 0) {
-                return <li onClick={() => { this.props.clickedProduct(null) }}>No such product exists</li>
+                return (<Alert>no products found</Alert>)
             }
             else {
-                console.log("Received props from store")
-                return this.state.filteredProducts.map(p => {
+                return this.state.filteredProducts.map(product => {
                     return (
-                        <li key={p.id} onClick={() => { this.props.clickedProduct(p) }}>
-                            {p.name}<br></br>
-                        </li>
+                    <Card className = 'products'>
+                    <Card.Img src={"images/" + product.image} alt="Card image cap" />
+                    <Card.Body>
+                         <Card.Title><u>{product.name}</u></Card.Title>
+                        <Card.Subtitle>Price : {product.price}</Card.Subtitle>
+                        <Card.Text>
+                            Category : {product.category}<br></br>
+                            Quantity : {product.quantity}<br></br>
+                            Stock : {product.stock}<br />
+                        </Card.Text>
+                        <Link to='/edit'>
+                            <Button variant="primary" onClick={() => this.editProduct(product)}>Edit</Button>
+                        </Link> &nbsp;
+                           <Button variant="danger" onClick={() => this.deleteProduct(product)}>Delete</Button>
+                        <br />
+                        <br/>
+                    </Card.Body>
+                </Card>
                     )
                 })
             }
         }
-        else {
-            console.log("Received props from store")
-            return this.props.products.map(p => {
-                return (
-                    <li key={p.id} onClick={() => { this.props.clickedProduct(p) }}>
-                        {p.name}<br></br>
-                    </li>
-                )
+        else{
+        return this.props.products.map(product => {
+            return (
+                <Card className = 'products'>
+                    <Card.Img src={"images/" + product.image} alt="Card image cap" />
+                    <Card.Body>
+                        <Card.Title><u>{product.name}</u></Card.Title>
+                        <Card.Subtitle>Price : {product.price}</Card.Subtitle>
+                        <Card.Text>
+                            Category : {product.category}<br></br>
+                            Quantity : {product.quantity}<br></br>
+                            Stock : {product.stock}<br />
+                        </Card.Text>
+                        <Link to='/edit'>
+                            <Button variant="primary" onClick={() => this.editProduct(product)}>Edit</Button>
+                        </Link> &nbsp;
+                           <Button variant="danger" onClick={() => this.deleteProduct(product)}>Delete</Button>
+                        <br />
+                    </Card.Body>
+                </Card>
+            )
+        })
+    }
+}
+    editProduct = (product) => {
+        this.props.history.push({
+            pathname: '/editproduct', 
+            state: { product: product }
+        })
+        this.props.clickedProduct(product)
+    }
+    deleteProduct = (product) => {
+        axios.delete('http://localhost:3000/products/' + product.id)
+            .then(response => {
+                this.allProducts()
+            }, error => {
+                console.log(error)
             })
-        }
     }
 
     render() {
-        if (this.props.products.length === 0) {
-            return (
-                <div><h2>All products will be displayed here!!</h2></div>
-            );
-        }
         return (
             <div>
-                <input type="search" placeholder="Search" value={this.state.searchValue} onChange={this.searchProduct} />
-                <h2>Product List:</h2>
-                <ol>
-                    {this.getAllProducts()}
-                </ol>
+                <input type="text" className="searchtext" placeholder="Search.." name="search" value={this.state.searchValue} onChange={this.searchProduct}></input>
+                <button type="submit" className="searchbutton" >Search</button><hr></hr>
+                {this.getAllProducts()}
             </div>
-        );
+        )
     }
 }
-function ConvertStoretoProps(store){
-    console.log("received props")
-    return{
-       products:store.allproductsreducer
-      
+
+function convertStoreToProps(store) {
+    console.log("Received complete store")
+    console.log(store)
+    return {
+        products: store.allproductsreducer,
+        product: store.productClickedReducer,
     }
 }
-function convertEventToProps(dispatch){
+
+function convertEventToProps(dispatch) {
     return bindActionCreators({
-        clickedProduct:productClickedBroadcast,
-        sendAllProduct: displayProductBroadcast
+        clickedProduct: productClickedBroadcast,
+        sendAllProduct:displayProductBroadcast,
+        deleteProduct: deleteProductBroadcast
     }, dispatch)
 }
-export default connect( ConvertStoretoProps,convertEventToProps) (ProductList);
+
+export default connect(convertStoreToProps, convertEventToProps)( ProductList);

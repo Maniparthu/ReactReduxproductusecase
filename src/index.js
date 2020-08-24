@@ -8,7 +8,7 @@ import combineallreducers from './reducers/combineallreducers';
 import { HashRouter } from 'react-router-dom';
 
 const store= createStore(combineallreducers)
-
+console.log(store)
 ReactDOM.render(
   <HashRouter>
   <Provider store={store}>

@@ -4,6 +4,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import  addProductBroadcast from '../actions/addproductbroadcaster'
 import axios from "axios";
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const validateForm = errors => {
     let valid = true;
@@ -14,6 +15,7 @@ class AddProduct extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
+            image:"",
             name: "",
             category: "",
             price: 0,
@@ -79,7 +81,13 @@ class AddProduct extends React.Component {
         })
 
     }
+    getImage= (event) => {
+        console.log(event)
+        console.log(event.target)
+        console.log(event.target.value)
+        this.setState({image: event.target.value.substr(12)})
 
+    }
     allProducts() {
         axios.get("http://localhost:3000/products")
             .then(response => {
@@ -94,6 +102,7 @@ class AddProduct extends React.Component {
         
             event.preventDefault()
             let product = {
+                image:this.state.image,
                 name: this.state.name,
                 category: this.state.category,
                 price: this.state.price,
@@ -104,6 +113,7 @@ class AddProduct extends React.Component {
                     console.log(response)
                     console.log("New Product Added !")
                     this.allProducts()
+                    this.props.history.push('/productlist')
                 }, error => {
                     console.log(error)
                 })
@@ -145,13 +155,13 @@ const textStyle = {
     width:'40%',
     padding:'6px 10px',
     marging: '8px 0',
-    
     display:'flex',
     justifyContent: 'center',
     alignItems: 'center'
     
 }
         return (
+            <div className="form">
             <div>
                 <form name="form" onChange={this.handleSubmit} style={Cointainer}>
                     <h2>Add Product</h2>
@@ -170,7 +180,7 @@ const textStyle = {
                             onChange={this.getCategory}
                         >
                             <option value="">--select--</option>
-                            <option value="Mobiles">Elements</option>
+                            <option value="Mobiles">Electronics</option>
                             <option value="Laptops">Clothing</option>
                             <option value="Cameras">Stationary</option>
                         </select>
@@ -203,11 +213,16 @@ const textStyle = {
                             <span className="error">{errors.stockError}</span>
                         )}
                     </div><br />
-                    <div>
-                        <button disabled={this.state.buttonStatus} style={CBButtonStyle} onClick={this.addProduct}>Add</button>
+                    <label>IMAGE</label> &nbsp;
+
+                  <input type="file" defaultValue={this.state.selectValue} id="file-id" name="file_name"  style={textStyle} onChange={this.getImage} multiple accept='image/*'></input>
+                <div >
+                   
+                        <button data-testid='button' disabled={this.state.buttonStatus} style={CBButtonStyle} onClick={this.addProduct}>Add</button>
                     </div>
                     <br />
                 </form>
+            </div>
             </div>
         );
     }

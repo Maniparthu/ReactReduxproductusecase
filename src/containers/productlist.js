@@ -66,7 +66,6 @@ class ProductList extends React.Component {
                         <Card.Subtitle>Price : {product.price}</Card.Subtitle>
                         <Card.Text>
                             Category : {product.category}<br></br>
-                            Quantity : {product.quantity}<br></br>
                             Stock : {product.stock}<br />
                         </Card.Text>
                         <Link to='/edit'>
@@ -91,7 +90,6 @@ class ProductList extends React.Component {
                         <Card.Subtitle>Price : {product.price}</Card.Subtitle>
                         <Card.Text>
                             Category : {product.category}<br></br>
-                            Quantity : {product.quantity}<br></br>
                             Stock : {product.stock}<br />
                         </Card.Text>
                         <Link to='/edit'>

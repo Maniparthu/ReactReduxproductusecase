@@ -153,6 +153,7 @@ class EditProduct extends React.Component {
              opacity: '0.8'  
     }
         return (
+            <div>
             <div className="form"> 
                 <form name="form" onChange={this.handleSubmit} style={Cointainer}>
                     <h3>Edit Product</h3>
@@ -229,6 +230,7 @@ class EditProduct extends React.Component {
                     <br />
                 </form>
             </div>
+            </div>
         );
     }
 }
@@ -241,7 +243,8 @@ function convertStoreToPropsForProductDetail(store) {
     }
 }
 function eventDispatch(dispatch) {
-    return bindActionCreators({ edit: editClicked }, dispatch)
+    return bindActionCreators({
+         edit: editClicked }, dispatch)
 }
 
 export default connect(convertStoreToPropsForProductDetail, eventDispatch)(EditProduct);

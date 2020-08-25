@@ -162,7 +162,7 @@ const textStyle = {
 }
         return (
             <div className="form">
-            <div>
+            <div id='add'>
                 <form name="form" onChange={this.handleSubmit} style={Cointainer}>
                     <h2>Add Product</h2>
                     <div className="name">
